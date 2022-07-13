@@ -34,7 +34,7 @@ jobs:
         run: go get
 
       - name: Install Gox Cross-Compiler
-        run: go install github.com/mitchellh/gox
+        run: go get github.com/mitchellh/gox && go install github.com/mitchellh/gox
 
       - name: Build bineries
         run: CGO_ENABLED=0 $(go env GOPATH)/bin/gox -verbose -osarch="${{ matrix.os }}/${{ matrix.arch }}" -ldflags="-s -w" -output="bin/{{.Dir}}-{{.OS}}-{{.Arch}}"
@@ -42,8 +42,8 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: logdns-${{ matrix.os }}-${{ matrix.arch }}
-          path: bin/logdns-*
+          name: intercept-dns-${{ matrix.os }}-${{ matrix.arch }}
+          path: bin/intercept-dns-*
 
   deploy:
     name: Deploy
@@ -78,13 +78,13 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v2
         with:
-          name: logdns-${{ matrix.os }}-${{ matrix.arch }}
+          name: intercept-dns-${{ matrix.os }}-${{ matrix.arch }}
           path: bin/
 
       - name: Build Docker image
         run: |
-          mv bin/logdns-* bin/logdns
-          chmod 755 bin/logdns
+          mv bin/intercept-dns-* bin/intercept-dns
+          chmod 755 bin/intercept-dns
           docker pull ${{ matrix.base }}/alpine:latest
           docker build \
             --pull \
@@ -101,15 +101,15 @@ jobs:
             --label "org.opencontainers.image.title=Intercept-DNS" \
             --label "org.opencontainers.image.base.name=${{ matrix.base }}/alpine:latest" \
             --label  org.opencontainers.image.base.digest=$(docker image inspect ${{ matrix.base }}/alpine:latest | grep -o 'Id": "[a-z0-9:]*' | sed 's/Id": "//g') \
-            --tag "${{ env.DOCKERHUB_USERNAME }}/logdns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}" \
+            --tag "${{ env.DOCKERHUB_USERNAME }}/intercept-dns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}" \
             .
       - name: Retag amd64 as latest
         if: ${{ matrix.os == 'linux' && matrix.arch == 'amd64' }}
-        run: docker tag "${{ env.DOCKERHUB_USERNAME }}/logdns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}" "${{ env.DOCKERHUB_USERNAME }}/logdns:latest"
+        run: docker tag "${{ env.DOCKERHUB_USERNAME }}/intercept-dns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}" "${{ env.DOCKERHUB_USERNAME }}/intercept-dns:latest"
 
       - name: Upload Docker image
-        run: docker push "${{ env.DOCKERHUB_USERNAME }}/logdns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}"
+        run: docker push "${{ env.DOCKERHUB_USERNAME }}/intercept-dns:$(cat version)-${{ matrix.os }}-${{ matrix.base }}"
 
       - name: Upload latest Docker image
         if: ${{ matrix.os == 'linux' && matrix.arch == 'amd64' }}
-        run: docker push "${{ env.DOCKERHUB_USERNAME }}/logdns:latest"
+        run: docker push "${{ env.DOCKERHUB_USERNAME }}/intercept-dns:latest"
