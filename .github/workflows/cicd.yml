@@ -34,7 +34,7 @@ jobs:
         run: go get
 
       - name: Install Gox Cross-Compiler
-        run: go install github.com/mitchellh/gox
+        run: go get github.com/mitchellh/gox && go install github.com/mitchellh/gox
 
       - name: Build bineries
         run: CGO_ENABLED=0 $(go env GOPATH)/bin/gox -verbose -osarch="${{ matrix.os }}/${{ matrix.arch }}" -ldflags="-s -w" -output="bin/{{.Dir}}-{{.OS}}-{{.Arch}}"
