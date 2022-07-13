@@ -90,7 +90,7 @@ jobs:
             --pull \
             --no-cache \
             --force-rm \
-            --file Dockerfile.alpine \
+            --file Dockerfile \
             --build-arg ARCH=${{ matrix.base }} \
             --label "org.opencontainers.image.created=$(date --rfc-3339=seconds)" \
             --label "org.opencontainers.image.authors=Frederik Enste <frederik@fenste.de>" \
