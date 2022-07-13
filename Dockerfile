@@ -9,4 +9,4 @@ ENV REMOTE_PORT=53
 
 EXPOSE 53
 
-CMD [ "/usr/local/bin/intercept-dns", "-remote-dns-ip", "${REMOTE_DNS}", "-remote-dns-port", "${REMOTE_PORT}" ]
+CMD [ "sh", "-c", "/usr/local/bin/intercept-dns -remote-dns-ip $REMOTE_DNS -remote-dns-port $REMOTE_PORT" ]
