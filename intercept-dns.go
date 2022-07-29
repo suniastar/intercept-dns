@@ -68,7 +68,7 @@ func handleDnsRequest(w dns.ResponseWriter, m *dns.Msg) {
 	if e != nil {
 		log.Fatalf("Failed to forward request: %s\n", e.Error())
 	}
-	log.Printf("Forwared respose: %s (%d)\n", a.Answer, t)
+	log.Printf("Forward response: %s (%d)\n", a.Answer, t)
 	r.Answer = a.Answer
 
 	err := w.WriteMsg(r)
